@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Q56091045 2021 DBMS</title>
+    <!-- Vue.js cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- axios cdn -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <!-- local style -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        div {
+            text-align: center;
+            margin: auto;
+            padding: 10px 0;
+        }
+        select {
+            font-size: 1rem;
+            padding: 3px;
+        }
+        textarea {
+            width: 60vw;
+            min-width: 300px;
+            max-width: 600px;
+            height: 120px;
+            resize: none;
+            font-size: 1.1rem;
+            padding: 5px;
+        }
+        button {
+            padding: 5px 10px;
+            font-size: 1.2rem;
+        }
+        table {
+            margin: auto;
+            border-spacing: 1px;
+        }
+        th {
+            background-color: #fdd;
+        }
+        td {
+            background-color: #ffa;
+        }
+        th, td {
+            padding: 5px 10px;
+        }
+        .example {
+            background-color: #eef;
+            height: 300px;
+            max-width: 600px;
+            overflow: auto;
+        }
+        .example div {
+            padding: 0;
+        }
+        .example-instroction {
+            padding: 10px 0;
+            font-weight: 600;
+            color: #f33;
+        }
+        .example-instroction:hover {
+            background-color: #ddf;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+{% raw %}
+
+<div id="app">
+    <div>
+        <h2>與特定情感有關的電影推薦</h2>
+    </div>
+    <div v-if="queryType == 'MySQL'">
+        <p>請在下方輸入文字，結果顯示在最下方</p>
+    </div>
+    <div v-if="queryType == 'MySQL'">
+        <textarea v-model="msg"></textarea>
+    </div>
+    <div>
+        <button v-if="queryType == 'MySQL'" v-on:click="btnclick()">送出文字</button>
+        <button v-if="queryType != 'MySQL'" v-on:click="btnclick()">送出</button>
+    </div>
+    <div v-if="queryType == 'MySQL'">
+        <h2>範例指令，點擊可以直接複製到文字輸入框中</h2>
+    </div>
+    <div class="example" v-if="queryType == 'MySQL'">
+        <div v-for="(data, idx) in exampleData" :key="idx">
+            <h3>{{ data.title }}</h3>
+            <p class="example-instroction" v-on:click="changeMsg(data.instruction)">{{ data.instruction }}</p>
+        </div>
+    </div>
+
+    <div>
+        <h3 v-if="tagTable">顯示電影類別結果</h3>
+        <table v-if="tagTable">
+            <thead>
+                <tr>
+                    <th v-for="(description, idx) in tableDescripe" :key="idx"> {{ description }} </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in tagRowData" :key="row.id">
+                    <td v-for="item in row" :key="item.id">
+                        {{ item }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3 v-if="directorTable">導演拍攝的電影</h3>
+        <table v-if="directorTable">
+            <thead>
+                <tr>
+                    <th v-for="(description, idx) in tableDescripe" :key="idx"> {{ description }} </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in directorRowData" :key="row.id">
+                    <td v-for="item in row" :key="item.id">
+                        {{ item }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3 v-if="actorTable">演員演過的電影</h3>
+        <table v-if="actorTable">
+            <thead>
+                <tr>
+                    <th v-for="(description, idx) in tableDescripe" :key="idx"> {{ description }} </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in actorRowData" :key="row.id">
+                    <td v-for="item in row" :key="item.id">
+                        {{ item }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h3 v-if="emotionTable">情緒與電影</h3>
+        <table v-if="emotionTable">
+            <thead>
+                <tr>
+                    <th v-for="(description, idx) in tableDescripe" :key="idx"> {{ description }} </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="row in emotionRowData" :key="row.id">
+                    <td v-for="item in row" :key="item.id">
+                        {{ item }}
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+
+let app = new Vue({
+    el: "#app",
+    data: {
+        queryType: "MySQL",
+        msg: "",
+        tableData: {},
+        tableDescripe: [],
+
+        tableRowData: [],
+        showTable: false,
+
+        tagRowData: [],
+        tagTable: false,
+        directorRowData: [],
+        directorTable: false,
+        actorRowData: [],
+        actorTable: false,
+        emotionRowData: [],
+        emotionTable: false,
+
+        exampleData: [
+            {
+                title: "查詢科幻電影",
+                instruction: "我想看科幻電影"
+            },
+            {
+                title: "查詢史蒂芬史匹柏電影",
+                instruction: "我想看史蒂芬史匹柏導演的電影"
+            },
+            {
+                title: "查詢艾瑪花生電影",
+                instruction: "我想看艾瑪華森的電影"
+            },
+            {
+                title: "單一情緒查詢電影",
+                instruction: "我想看開心的電影"
+            },
+            {
+                title: "單一情緒查詢電影",
+                instruction: "我想看傷心的電影"
+            },
+            {
+                title: "複雜情緒查詢電影",
+                instruction: "我想看開心、勇敢的電影"
+            },
+            {
+                title: "複雜情緒查詢電影",
+                instruction: "我想看傷心、害怕的電影"
+            },
+        ]
+    },
+    methods: {
+        btnclick: function() {
+            if (this.queryType != "MySQL") {
+                this.msg = "SELECT * FROM `" + this.queryType + "`;"
+                console.log(this.msg)
+            }
+            axios.post("/sql", {
+                msg: this.msg
+            }).then(response=>{
+                this.tableData = response.data
+                this.tableDescripe = this.tableData.descriptions
+
+                if (this.tableData.tag_rows.length !== 0) {
+                    this.tagRowData = this.tableData.tag_rows
+                    this.tagTable = true
+                } else {
+                    this.tagTable = false
+                }
+
+                if (this.tableData.director_rows.length !== 0) {
+                    this.directorRowData = this.tableData.director_rows
+                    this.directorTable = true
+                } else {
+                    this.directorTable = false
+                }
+
+                if (this.tableData.actor_rows.length !== 0) {
+                    this.actorRowData = this.tableData.actor_rows
+                    this.actorTable = true
+                } else {
+                    this.actorTable = false
+                }
+
+                if (this.tableData.emotion_rows.length !== 0) {
+                    this.emotionRowData = this.tableData.emotion_rows
+                    this.emotionTable = true
+                } else {
+                    this.emotionTable = false
+                }
+            })
+        },
+        changeMsg: function(newMsg) {
+            this.msg = newMsg
+        }
+    },
+    watch: {
+        queryType: function () {
+            this.showTable = false
+            this.tableDescripe = []
+            this.tableRowData = []
+        }
+    }
+})
+
+</script>
+
+{% endraw %}
+
+</body>
+</html>
