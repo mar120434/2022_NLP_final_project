@@ -154,65 +154,74 @@ def sql():
 
     # 請在這裡修改連線資訊
     def tag_token_search(token):
-        output_sql_data = []
+        output_sql_data = {}
         g = Graph("http://140.116.245.151:7474/", auth = ("neo4j", "neo4j"))
-        sql_instr = "MATCH p = (n0:tag_type{name:\"" + token[0][0] + "\"})-[:tag]-(n1) RETURN n1 LIMIT 20"
+        sql_instr = "MATCH p = (n0:tag_type{name:\"" + token[0][0] + "\"})-[:tag]-(n1) RETURN n1"
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            print(data[iter]["n1"]["name"])
+            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
-            output_sql_data.append(row_data_list)
+            row_data_list.append(data[iter]["n1"]["IMG"])
+            row_data_list.append(data[iter]["n1"]["URL"])
+            output_sql_data[data[iter]["n1"]["name"]] = row_data_list
         return output_sql_data
 
     def director_token_search(token):
-        output_sql_data = []
+        output_sql_data = {}
         g = Graph("http://140.116.245.151:7474/", auth = ("neo4j", "neo4j"))
-        sql_instr = "MATCH p = (n0:Director_type{name:\"" + token[0][0] + "\"})-[:Director]-(n1) RETURN n1 LIMIT 20"
+        sql_instr = "MATCH p = (n0:Director_type{name:\"" + token[0][0] + "\"})-[:Director]-(n1) RETURN n1"
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            print(data[iter]["n1"]["name"])
+            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
-            output_sql_data.append(row_data_list)
+            row_data_list.append(data[iter]["n1"]["IMG"])
+            row_data_list.append(data[iter]["n1"]["URL"])
+            output_sql_data[data[iter]["n1"]["name"]] = row_data_list
         return output_sql_data
 
     def actor_token_search(token):
-        output_sql_data = []
+        output_sql_data = {}
         g = Graph("http://140.116.245.151:7474/", auth = ("neo4j", "neo4j"))
-        sql_instr = "MATCH p = (n0:Actor_type{name:\"" + token[0][0] + "\"})-[:actor]-(n1) RETURN n1 LIMIT 20"
+        sql_instr = "MATCH p = (n0:Actor_type{name:\"" + token[0][0] + "\"})-[:actor]-(n1) RETURN n1"
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            print(data[iter]["n1"]["name"])
+            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
-            output_sql_data.append(row_data_list)
+            row_data_list.append(data[iter]["n1"]["IMG"])
+            row_data_list.append(data[iter]["n1"]["URL"])
+            output_sql_data[data[iter]["n1"]["name"]] = row_data_list
         return output_sql_data
 
     def emotion_token_search(emotion):
-        output_sql_data = []
+        output_sql_data = {}
         g = Graph("http://140.116.245.151:7474/", auth = ("neo4j", "neo4j"))
         sql_instr = ""
         if len(emotion) == 1:
-            sql_instr = "MATCH p = (n0:Emotion_type{name:\"" + emotion[0] + "\"})-[:emotion]-(n1) RETURN n1 LIMIT 20"
+            sql_instr = "MATCH p = (n0:Emotion_type{name:\"" + emotion[0] + "\"})-[:emotion]-(n1) RETURN n1"
         elif len(emotion) == 2:
-            sql_instr = "MATCH p = (n0:Emotion_type{name:\"" + emotion[0] + "\"})-[:emotion]-(n1)-[:emotion]-(n2:Emotion_type{name:\""+ emotion[1] +"\"}) RETURN n1 LIMIT 20"
+            sql_instr = "MATCH p = (n0:Emotion_type{name:\"" + emotion[0] + "\"})-[:emotion]-(n1)-[:emotion]-(n2:Emotion_type{name:\""+ emotion[1] +"\"}) RETURN n1"
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            print(data[iter]["n1"]["name"])
+            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
-            output_sql_data.append(row_data_list)
+            row_data_list.append(data[iter]["n1"]["IMG"])
+            row_data_list.append(data[iter]["n1"]["URL"])
+            output_sql_data[data[iter]["n1"]["name"]] = row_data_list
         return output_sql_data
 
 
     try:
         descriptions = ["名稱"]
-        output_sql_data = []
-        tag_output_data = []
-        director_output_data = []
-        actor_output_data = []
-        emotion_output_data = []
+        output_sql_data = {}
+        tag_output_data = {}
+        director_output_data = {}
+        actor_output_data = {}
+        emotion_output_data = {}
+        director_emotion_output_data = {}
         if len(Tag_toke) > 0:
             tag_output_data = tag_token_search(Tag_toke)
         if len(Director_toke) > 0:
@@ -222,13 +231,20 @@ def sql():
         if len(emotion) > 0:
             emotion_output_data = emotion_token_search(emotion)
 
+        # director and emotion
+        a = director_output_data.keys() & emotion_output_data.keys()
+        for item in a:
+            if item in director_output_data:
+                director_emotion_output_data[item] = director_output_data[item]
+
         response = {
             "descriptions": descriptions,
             "rows": output_sql_data,
             "tag_rows": tag_output_data,
             "director_rows": director_output_data,
             "actor_rows": actor_output_data,
-            "emotion_rows": emotion_output_data
+            "emotion_rows": emotion_output_data,
+            "director_emotion_rows": director_emotion_output_data,
         }
     except:
         response = {"descriptions": ["指令打錯了"], "rows": [["回去重寫"]]}

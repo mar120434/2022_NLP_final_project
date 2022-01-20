@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Q56091045 2021 DBMS</title>
+    <title>Q56091045 2022 Emotion and Movie</title>
     <!-- Vue.js cdn -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
     <!-- axios cdn -->
@@ -49,6 +49,9 @@
         }
         th, td {
             padding: 5px 10px;
+        }
+        img {
+            width: 200px;
         }
         .example {
             background-color: #eef;
@@ -108,8 +111,12 @@
             </thead>
             <tbody>
                 <tr v-for="row in tagRowData" :key="row.id">
-                    <td v-for="item in row" :key="item.id">
-                        {{ item }}
+                    <td>
+                        <a :href="row[2]">
+                            <img :src="row[1]" alt="">
+                            <br>
+                            {{ row[0] }}
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -126,8 +133,12 @@
             </thead>
             <tbody>
                 <tr v-for="row in directorRowData" :key="row.id">
-                    <td v-for="item in row" :key="item.id">
-                        {{ item }}
+                    <td>
+                        <a :href="row[2]">
+                            <img :src="row[1]" alt="">
+                            <br>
+                            {{ row[0] }}
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -144,8 +155,12 @@
             </thead>
             <tbody>
                 <tr v-for="row in actorRowData" :key="row.id">
-                    <td v-for="item in row" :key="item.id">
-                        {{ item }}
+                    <td>
+                        <a :href="row[2]">
+                            <img :src="row[1]" alt="">
+                            <br>
+                            {{ row[0] }}
+                        </a>
                     </td>
                 </tr>
             </tbody>
@@ -162,8 +177,12 @@
             </thead>
             <tbody>
                 <tr v-for="row in emotionRowData" :key="row.id">
-                    <td v-for="item in row" :key="item.id">
-                        {{ item }}
+                    <td>
+                        <a :href="row[2]">
+                            <img :src="row[1]" alt="">
+                            <br>
+                            {{ row[0] }}
+                        </a>
                     </td>
                 </tr>
             </tbody>
