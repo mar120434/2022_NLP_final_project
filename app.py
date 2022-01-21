@@ -160,7 +160,6 @@ def sql():
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["IMG"])
             row_data_list.append(data[iter]["n1"]["URL"])
@@ -174,7 +173,6 @@ def sql():
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["IMG"])
             row_data_list.append(data[iter]["n1"]["URL"])
@@ -188,7 +186,6 @@ def sql():
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["IMG"])
             row_data_list.append(data[iter]["n1"]["URL"])
@@ -206,7 +203,6 @@ def sql():
         data = g.run(sql_instr).data()
         for iter in range(len(data)):
             row_data_list = []
-            # print(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["name"])
             row_data_list.append(data[iter]["n1"]["IMG"])
             row_data_list.append(data[iter]["n1"]["URL"])
@@ -215,6 +211,17 @@ def sql():
 
 
     try:
+        # 限制 output_data 的 length
+        def limit_max_length(output_data):
+            output_max_length = 10
+            if len(output_data) > output_max_length:
+                temp_output_data = {}
+                for item in output_data:
+                    if len(temp_output_data) < output_max_length:
+                        temp_output_data[item] = output_data[item]
+                output_data = temp_output_data
+            return output_data
+
         descriptions = ["名稱"]
         output_sql_data = {}
         tag_output_data = {}
@@ -222,6 +229,8 @@ def sql():
         actor_output_data = {}
         emotion_output_data = {}
         director_emotion_output_data = {}
+        actor_emotion_output_data = {}
+
         if len(Tag_toke) > 0:
             tag_output_data = tag_token_search(Tag_toke)
         if len(Director_toke) > 0:
@@ -232,10 +241,23 @@ def sql():
             emotion_output_data = emotion_token_search(emotion)
 
         # director and emotion
-        a = director_output_data.keys() & emotion_output_data.keys()
-        for item in a:
+        director_and_emotion = director_output_data.keys() & emotion_output_data.keys()
+        for item in director_and_emotion:
             if item in director_output_data:
                 director_emotion_output_data[item] = director_output_data[item]
+
+        # actor and emotion
+        actor_and_emotion = actor_output_data.keys() & emotion_output_data.keys()
+        for item in actor_and_emotion:
+            if item in actor_output_data:
+                actor_emotion_output_data[item] = actor_output_data[item]
+
+        tag_output_data = limit_max_length(tag_output_data)
+        director_output_data = limit_max_length(director_output_data)
+        actor_output_data = limit_max_length(actor_output_data)
+        emotion_output_data = limit_max_length(emotion_output_data)
+        director_emotion_output_data = limit_max_length(director_emotion_output_data)
+        actor_emotion_output_data = limit_max_length(actor_emotion_output_data)
 
         response = {
             "descriptions": descriptions,
@@ -245,6 +267,7 @@ def sql():
             "actor_rows": actor_output_data,
             "emotion_rows": emotion_output_data,
             "director_emotion_rows": director_emotion_output_data,
+            "actor_emotion_rows": actor_emotion_output_data
         }
     except:
         response = {"descriptions": ["指令打錯了"], "rows": [["回去重寫"]]}

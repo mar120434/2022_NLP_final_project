@@ -213,6 +213,11 @@ let app = new Vue({
         emotionRowData: [],
         emotionTable: false,
 
+        directorEmotionRowData: [],
+        directorEmotionTable: false,
+        actorEmotionRowData: [],
+        actorEmotionTable: false,
+
         exampleData: [
             {
                 title: "查詢科幻電影",
@@ -256,32 +261,46 @@ let app = new Vue({
                 this.tableData = response.data
                 this.tableDescripe = this.tableData.descriptions
 
-                if (this.tableData.tag_rows.length !== 0) {
+                if (Object.keys(this.tableData.tag_rows).length !== 0) {
                     this.tagRowData = this.tableData.tag_rows
                     this.tagTable = true
                 } else {
                     this.tagTable = false
                 }
 
-                if (this.tableData.director_rows.length !== 0) {
+                if (Object.keys(this.tableData.director_rows).length !== 0) {
                     this.directorRowData = this.tableData.director_rows
                     this.directorTable = true
                 } else {
                     this.directorTable = false
                 }
 
-                if (this.tableData.actor_rows.length !== 0) {
+                if (Object.keys(this.tableData.actor_rows).length !== 0) {
                     this.actorRowData = this.tableData.actor_rows
                     this.actorTable = true
                 } else {
                     this.actorTable = false
                 }
 
-                if (this.tableData.emotion_rows.length !== 0) {
+                if (Object.keys(this.tableData.emotion_rows).length !== 0) {
                     this.emotionRowData = this.tableData.emotion_rows
                     this.emotionTable = true
                 } else {
                     this.emotionTable = false
+                }
+
+                if (Object.keys(this.tableData.director_emotion_rows).length !== 0) {
+                    this.directorEmotionRowData = this.tableData.director_emotion_rows
+                    this.directorEmotionTable = true
+                } else {
+                    this.directorEmotionTable = false
+                }
+
+                if (Object.keys(this.tableData.actor_emotion_rows).length !== 0) {
+                    this.actorEmotionRowData = this.tableData.actor_emotion_rows
+                    this.actorEmotionTable = true
+                } else {
+                    this.actorEmotionTable = false
                 }
             })
         },
